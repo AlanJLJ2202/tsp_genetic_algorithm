@@ -3,23 +3,25 @@ import pandas as pd
 import random
 
 # Definir los parámetros del algoritmo genético
-population_size = 500
 chromosome_length = 10
-num_generations = 1000
 mutation_rate = 0.01
+cantidad_generaciones = 1000
+poblacion = 500
+
 
 #Read kro file
 with open('kroA100.tsp', 'r') as file:
     data = file.readlines()
 
+#Nota: Tal vez es mejor no quitar la columna de "No." por que contiene el indice de la ciudad
 df = pd.DataFrame([line.split() for line in data], columns=['No.','x', 'y'])
 coords = df.drop(columns = 'No.')
-coords_list = coords.astype(int).values.tolist() #Float list
+coords_list = coords.astype(int).values.tolist() #Int list
 
-#print(coords_list)
-
-cantidad_generaciones = 1000
-poblacion = 500
+#Formula de la distancia euclidiana
+def euclidean_distance(x1, y1, x2, y2):
+    distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return distance
 
 def permute_list(coords_list):
     permuted_list = random.sample(coords_list, len(coords_list))
@@ -28,17 +30,51 @@ def permute_list(coords_list):
 population_size = 500
 num_cities = len(coords_list)
 
+#---Esto a lo mejor se puede optimizar
 # Generar una solución aleatoria única sin elementos repetidos
 unique_solutions = []
 while len(unique_solutions) < population_size:  # Generar 500 soluciones únicas
-    solution = np.random.permutation(num_cities)
+    solution = np.random.permutation(coords_list)
     if not any(np.array_equal(solution, s) for s in unique_solutions):
         unique_solutions.append(solution)
 
 
-print('POBLACION')
-print(unique_solutions)
+#Calcula la aptitud de la solucion, este metodo simplemente recibe una solucion y le calcula
+#su distancia euclidiana, entre mas distancia menos apta es la solucion
+def fitness(solution):
+    euclidean_distances = []
+    for i in range(len(solution)):
+        x1 = solution[i][0]
+        y1 = solution[i][1]
+        
+        if i == (len(solution)-1):
+            x2 = solution[0][0]
+            y2 = solution[0][1]
+            distance = euclidean_distance(x1, y1, x2, y2)
+            euclidean_distances.append(distance)
+        else:
+            x2 = solution[i+1][0]
+            y2 = solution[i+1][1]
+            distance = euclidean_distance(x1, y1, x2, y2)
+            euclidean_distances.append(distance)
+        
+    return sum(euclidean_distances)
 
+#Evalua cada una de las soluciones, es decir calcula la distancia de cada una de ellas
+#y la agrega al inicio del array de la solucion, esto sirve para el metodo de seleccion
+def evaluate_solutions(unique_solutions):
+    evaluated_solutions = []
+    for solution in unique_solutions:
+        aptitud = fitness(solution)
+        evaluated_solution = list(solution)
+        evaluated_solution.insert(0, aptitud)
+        print("--------")
+        print(evaluated_solution)
+        evaluated_solutions.append(evaluated_solution)
+    return evaluated_solutions
+
+#Aqui solo lo puse para ejecutarlo xd
+evaluate_solutions(unique_solutions)
 
 '''
 # Definir la función de aptitud (para maximizar la suma de los elementos del cromosoma)
