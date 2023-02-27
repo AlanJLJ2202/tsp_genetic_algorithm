@@ -6,75 +6,92 @@ import random
 chromosome_length = 10
 mutation_rate = 0.01
 cantidad_generaciones = 1000
-poblacion = 500
-
+population_size = 500
+k = 2
 
 #Read kro file
 with open('kroA100.tsp', 'r') as file:
     data = file.readlines()
 
 #Nota: Tal vez es mejor no quitar la columna de "No." por que contiene el indice de la ciudad
-df = pd.DataFrame([line.split() for line in data], columns=['No.','x', 'y'])
-coords = df.drop(columns = 'No.')
-coords_list = coords.astype(int).values.tolist() #Int list
+cities_data = pd.DataFrame([line.split() for line in data], columns=['No.','x', 'y'])
+cities = cities_data.astype(int).values.tolist()
 
 #Formula de la distancia euclidiana
 def euclidean_distance(x1, y1, x2, y2):
     distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     return distance
 
-def permute_list(coords_list):
-    permuted_list = random.sample(coords_list, len(coords_list))
-
-# Generar población aleatoria
-population_size = 500
-num_cities = len(coords_list)
-
-#---Esto a lo mejor se puede optimizar
 # Generar una solución aleatoria única sin elementos repetidos
-unique_solutions = []
-while len(unique_solutions) < population_size:  # Generar 500 soluciones únicas
-    solution = np.random.permutation(coords_list)
-    if not any(np.array_equal(solution, s) for s in unique_solutions):
-        unique_solutions.append(solution)
-
+def generate_population(cities):
+    unique_solutions = []
+    while len(unique_solutions) < population_size:  # Generar 500 soluciones únicas
+        solution = np.random.permutation(cities)
+        if not any(np.array_equal(solution, s) for s in unique_solutions):
+            unique_solutions.append(solution)
+    unique_solutions
+    return unique_solutions
 
 #Calcula la aptitud de la solucion, este metodo simplemente recibe una solucion y le calcula
-#su distancia euclidiana, entre mas distancia menos apta es la solucion
+#su distancia euclidiana, entre mas distancia menos apta es la solucion 
+#x = solution[i][1]
+#y = solution[i][2]
 def fitness(solution):
     euclidean_distances = []
+    
     for i in range(len(solution)):
-        x1 = solution[i][0]
-        y1 = solution[i][1]
+        x1 = solution[i][1]
+        y1 = solution[i][2]
         
         if i == (len(solution)-1):
-            x2 = solution[0][0]
-            y2 = solution[0][1]
+            x2 = solution[0][1]
+            y2 = solution[0][2]
             distance = euclidean_distance(x1, y1, x2, y2)
             euclidean_distances.append(distance)
         else:
-            x2 = solution[i+1][0]
-            y2 = solution[i+1][1]
+            x2 = solution[i+1][1]
+            y2 = solution[i+1][2]
             distance = euclidean_distance(x1, y1, x2, y2)
             euclidean_distances.append(distance)
-        
+    
     return sum(euclidean_distances)
 
 #Evalua cada una de las soluciones, es decir calcula la distancia de cada una de ellas
 #y la agrega al inicio del array de la solucion, esto sirve para el metodo de seleccion
-def evaluate_solutions(unique_solutions):
+def evaluate_solutions(solutions):
     evaluated_solutions = []
-    for solution in unique_solutions:
+    for solution in solutions:
         aptitud = fitness(solution)
         evaluated_solution = list(solution)
         evaluated_solution.insert(0, aptitud)
-        print("--------")
-        print(evaluated_solution)
         evaluated_solutions.append(evaluated_solution)
     return evaluated_solutions
 
+#Metodo para realizar la compentencia entre k elementos, se usa la funcion min para seleccionar
+#la solucion con la menor distancia obtenida, este metodo retorna los mejores individuos 
+#de la poblacion
+def tournament(population, k):
+    selected = []
+
+    while len(selected) < len(population):
+        tournament = random.sample(population, k)
+        winner = min(tournament, key=lambda x: x[0])
+        selected.append(winner)
+    return selected
+
+
+#Metodo para mutar un elemento, este metodo recibe una solucion de ciudades 
+#e intercambia dos de estas de manera aleatoria
+def mutation(solution):
+    city1, city2 = random.sample(range(len(solution)), 2)
+    solution[city1], solution[city2] = solution[city2], solution[city1]
+    return solution
+
+
 #Aqui solo lo puse para ejecutarlo xd
-evaluate_solutions(unique_solutions)
+population = generate_population(cities)
+evaluated_population = evaluate_solutions(population)
+tournament(evaluated_population, k)
 
 '''
 # Definir la función de aptitud (para maximizar la suma de los elementos del cromosoma)
