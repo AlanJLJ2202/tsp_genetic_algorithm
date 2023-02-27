@@ -77,6 +77,7 @@ def tournament(population, k):
         tournament = random.sample(population, k)
         winner = min(tournament, key=lambda x: x[0])
         selected.append(winner)
+    print(selected)
     return selected
 
 
@@ -85,57 +86,33 @@ def tournament(population, k):
 def mutation(solution):
     city1, city2 = random.sample(range(len(solution)), 2)
     solution[city1], solution[city2] = solution[city2], solution[city1]
+    print(solution)
     return solution
 
+#Metodo para realizar el cruce de dos soluciones, este metodo recibe dos soluciones
+#Metodo de cruza PMX
+def crossover(solution1, solution2):
+    # Seleccionar dos puntos aleatorios
+    point1, point2 = sorted(random.sample(range(len(solution1)), 2))
+    # Intercambiar los valores entre los dos puntos
+    solution1[point1:point2], solution2[point1:point2] = solution2[point1:point2], solution1[point1:point2].copy()
+    # Corregir los valores que se repiten
+    for solution in (solution1, solution2):
+        for point in (point1, point2):
+            while solution[point] in solution[:point] + solution[point+1:]:
+                index = solution.index(solution[point])
+                solution[index] = solution[point]
+
+    return solution1, solution2
+
+#Por cada hijo se va a realizar la mutacion
 
 #Aqui solo lo puse para ejecutarlo xd
 population = generate_population(cities)
 evaluated_population = evaluate_solutions(population)
+print('POBLACION EVALUADA')
+print(evaluated_population)
+print('---------------------------------')
 tournament(evaluated_population, k)
-
-'''
-# Definir la función de aptitud (para maximizar la suma de los elementos del cromosoma)
-def fitness_function(chromosome):
-    return np.sum(chromosome)
-
-# Evaluar la aptitud de la población inicial
-fitness_scores = np.apply_along_axis(fitness_function, 1, population)
-
-# Repetir durante un número determinado de generaciones
-for generation in range(num_generations):
-
-    # Selección
-    selection_probabilities = fitness_scores / np.sum(fitness_scores)
-    selected_indices = np.random.choice(population_size, size=population_size, p=selection_probabilities)
-    selected_population = population[selected_indices]
-
-    # Cruce
-    offspring_population = np.zeros_like(selected_population)
-    for i in range(population_size):
-        parent1 = selected_population[i]
-        parent2 = selected_population[(i+1)%population_size]
-        swap_indices = np.random.choice(chromosome_length, size=2, replace=False)
-        offspring = np.copy(parent1)
-        offspring[swap_indices[0]] = parent2[swap_indices[0]]
-        offspring[swap_indices[1]] = parent2[swap_indices[1]]
-        offspring_population[i] = offspring
-
-    # Mutación
-    mutation_mask = np.random.random(offspring_population.shape) < mutation_rate
-    mutation_values = np.random.randint(2, size=offspring_population.shape)
-    offspring_population[mutation_mask] = mutation_values[mutation_mask]
-
-    # Evaluar la aptitud de la nueva población
-    offspring_fitness_scores = np.apply_along_axis(fitness_function, 1, offspring_population)
-
-    # Reemplazar la población anterior con la nueva población
-    population = offspring_population
-    fitness_scores = offspring_fitness_scores
-
-# Encontrar el mejor cromosoma de la última generación
-best_chromosome_index = np.argmax(fitness_scores)
-best_chromosome = population[best_chromosome_index]
-
-print("Mejor solución encontrada:", best_chromosome)
-print("Valor de aptitud:", fitness_function(best_chromosome))
-'''
+#crossover(population[0], population[1])
+#mutation(population[0])
