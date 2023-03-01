@@ -10,7 +10,7 @@ for i in range(2):
     
     elements.append(element)
 
-print(elements)
+#print("-----------------------------------")
 
 
 def PMX(solution1, solution2, cut1, cut2, size):
@@ -27,34 +27,23 @@ def PMX(solution1, solution2, cut1, cut2, size):
 
     child[cut1:cut2+1] = solution1[cut1:cut2+1]
 
-    print('Child =', child)
+    #print('Child =', child)
     aux = solution2[cut1:cut2+1]
-    print('Aux =', aux)
+    #print('Aux =', aux)
 
     for i in range(len(child)):
         for j in range(len(aux)):
             if aux[j] not in child:
-                #print(aux[j])
-                idx = solution2.index(aux[j])
-                print('IDX', idx)
-                idxchild = solution2.index(solution1[idx])
-                print('IDXCHILD', idxchild)
-                child[idxchild] = aux[j]
-                
-    print('NEW CHILD', child)
-            
-    if solution2[i] not in child:
-        print(solution2[i])
-        
-        ''''
-        if solution2[i] not in child:
+                idxchild = solution2.index(solution1[solution2.index(aux[j])])
+                if child[idxchild] == 0:
+                    child[idxchild] = aux[j]
+                else:
+                    child[solution2.index(solution1[idxchild])] = aux[j]
+        if child[i] == 0:
             child[i] = solution2[i]
-        else:
-            child[i] = solution1[i]
-        '''
-
-    #print(child)
-
+    
     return child
 
-PMX(elements[0], elements[1], start_point, end_point, element_lenght)
+child = PMX(elements[0], elements[1], start_point, end_point, element_lenght)
+text = " ".join(str(val) for val in child) 
+print(text)
