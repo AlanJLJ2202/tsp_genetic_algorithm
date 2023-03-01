@@ -99,8 +99,10 @@ def crossover(solution1, solution2):
     # Corregir los valores que se repiten
     for solution in (solution1, solution2):
         for point in (point1, point2):
-            while solution[point] in solution[:point] + solution[point+1:]:
+            while int(solution[point]) in [int(x) for x in solution[:point] + solution[point+1:]]:
                 index = solution.index(solution[point])
+                if index == point:
+                    break
                 solution[index] = solution[point]
 
     return solution1, solution2
@@ -113,6 +115,8 @@ evaluated_population = evaluate_solutions(population)
 print('POBLACION EVALUADA')
 print(evaluated_population)
 print('---------------------------------')
-tournament(evaluated_population, k)
-#crossover(population[0], population[1])
+torneos = tournament(evaluated_population, k)
+crossover(torneos[0], torneos[1])
+
+
 #mutation(population[0])
