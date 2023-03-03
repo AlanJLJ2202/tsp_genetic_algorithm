@@ -1,7 +1,5 @@
-
 element_lenght, start_point, end_point = map(int, input().split())
 elements = []
-
 
 for i in range(2):
     element = input().split(' ')
@@ -12,36 +10,33 @@ for i in range(2):
 
 #print("-----------------------------------")
 
-
 def PMX(solution1, solution2, cut1, cut2, size):
     child = []
 
     for i in range(size):
-        child.append(0)
+        child.append(None)
     
     if cut1 > cut2:
-        aux = 0
-        cut1 = aux
-        cut1 = cut2
-        cut2 = aux
+        cut1,cut2 = cut2,cut1
+    
 
     child[cut1:cut2+1] = solution1[cut1:cut2+1]
-
-    #print('Child =', child)
-    aux = solution2[cut1:cut2+1]
-    #print('Aux =', aux)
+    print("child" , child)
+    parent2 = solution2[cut1:cut2+1]
+    print("parent2", parent2)
 
     for i in range(len(child)):
-        for j in range(len(aux)):
-            if aux[j] not in child:
-                idxchild = solution2.index(solution1[solution2.index(aux[j])])
-                if child[idxchild] == 0:
-                    child[idxchild] = aux[j]
-                else:
-                    child[solution2.index(solution1[idxchild])] = aux[j]
-        if child[i] == 0:
+        for j in range(len(parent2)):
+            if parent2[j] not in child:
+                idxchild = solution2.index(solution1[solution2.index(parent2[j])])
+                print(child)
+                while child[idxchild] != None:
+                    idxchild = solution2.index(solution1[idxchild])
+                child[idxchild] = parent2[j]
+        
+        if child[i] == None:
             child[i] = solution2[i]
-    
+            
     return child
 
 child = PMX(elements[0], elements[1], start_point, end_point, element_lenght)
