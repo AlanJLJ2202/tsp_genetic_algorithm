@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import matplotlib.pyplot as plt
 
-generations = 1000
+generations = 250
 population_size = 100
 k = 2
 
@@ -134,7 +134,12 @@ parent2 = [165313, 14, 3, 100, 56, 10, 48, 55, 20, 74, 71, 86, 78, 69, 32, 79, 2
 
 population = generate_population(label_cities, population_size)
 best_solutions = []
+colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
 percentage = 0
+
+# se crea la figura y los ejes para la gráfica
+fig, ax = plt.subplots()
+
 for i in range(generations):
     new_percentaje = int((i * 100)/generations)
     if percentage != new_percentaje:
@@ -153,13 +158,36 @@ for i in range(generations):
         new_generation.append(child)
     
     population = new_generation
+
+    # Graficar la linea de la mejor solucion hasta el momento
+    # SE GRAFICA CADA GENERACIÓN
+    '''
+    ax.cla()
+    plt.plot(best_solutions, color=colors[i%len(colors)])
+
+    ax.text(0.95, 0.95, "Generacion {}: {}".format(i+1, best[0]), transform=ax.transAxes, color='white', ha='right', va='top', bbox=dict(facecolor='black', edgecolor='white', pad=3))
+    ax.set_ylabel('Distancia', color='white')
+    ax.set_xlabel('Generacion', color='white')
+    ax.set_title('TSP - Algoritmo Genetico', color='white')
+    plt.show(block=False)
+    ax.set_facecolor('black')
+    fig.patch.set_facecolor('black')
+    ax.spines['bottom'].set_color('white')
+    ax.spines['left'].set_color('white')
+    ax.tick_params(colors='white')
+    plt.pause(0.005)
+    '''
+
 print('Mejor solucion encontrada')
 print('----------------------------------------')
 print(best)
 print('Lista de mejores soluciones')
 print('----------------------------------------')
 print(best_solutions)
-plt.plot(best_solutions)
+
+#Graficar solo una vez las mejores soluciones
+ax.cla()
+plt.plot(best_solutions, color='red')
 plt.show()
 
 #population = generate_population(label_cities)
