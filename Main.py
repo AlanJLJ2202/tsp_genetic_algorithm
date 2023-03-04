@@ -3,8 +3,6 @@ import pandas as pd
 import random
 
 # Definir los parámetros del algoritmo genético
-chromosome_length = 10
-mutation_rate = 0.01
 cantidad_generaciones = 1000
 population_size = 500
 k = 2
@@ -77,7 +75,6 @@ def tournament(population, k):
         tournament = random.sample(population, k)
         winner = min(tournament, key=lambda x: x[0])
         selected.append(winner)
-    print(selected)
     return selected
 
 
@@ -91,6 +88,49 @@ def mutation(solution):
 
 #Metodo para realizar el cruce de dos soluciones, este metodo recibe dos soluciones
 #Metodo de cruza PMX
+def PMX(solution1, solution2):
+    
+    #solution1_cities = [city[0] for city in solution1 if city != float]
+    #print(solution1_cities)
+    
+
+    '''
+    child = []
+
+    size = len(solution1)
+
+    cut1, cut2 = random.sample(range(size), 2)
+
+
+    for i in range(size):
+        child.append(None)
+    
+    if cut1 > cut2:
+        cut1,cut2 = cut2,cut1
+    
+
+    child[cut1:cut2+1] = solution1[cut1:cut2+1]
+    print("child" , child)
+    parent2 = solution2[cut1:cut2+1]
+    print("parent2", parent2)
+
+    for i in range(len(child)):
+        for j in range(len(parent2)):
+            if parent2[j] not in child:
+                idxchild = solution2.index(solution1[solution2.index(parent2[j])])
+                print(child)
+                while child[idxchild] != None:
+                    idxchild = solution2.index(solution1[idxchild])
+                child[idxchild] = parent2[j]
+        
+        if child[i] == None:
+            child[i] = solution2[i]
+    '''     
+    return 0
+
+
+
+'''
 def crossover(solution1, solution2):
     # Seleccionar dos puntos aleatorios
     point1, point2 = sorted(random.sample(range(len(solution1)), 2))
@@ -106,17 +146,17 @@ def crossover(solution1, solution2):
                 solution[index] = solution[point]
 
     return solution1, solution2
+'''
+
+
 
 #Por cada hijo se va a realizar la mutacion
 
 #Aqui solo lo puse para ejecutarlo xd
 population = generate_population(cities)
 evaluated_population = evaluate_solutions(population)
-print('POBLACION EVALUADA')
-print(evaluated_population)
-print('---------------------------------')
-torneos = tournament(evaluated_population, k)
-crossover(torneos[0], torneos[1])
-
-
-#mutation(population[0])
+best_population = tournament(evaluated_population, k)
+parents = random.sample(best_population, 2)
+child = PMX(parents[0], parents[1])
+#mutated_child = mutation(child)
+#print(mutated_child)
